@@ -7,7 +7,7 @@ var sessionRestore = {
 
     // save all tabs that aren't private
 
-    for (var i = 0; i < data.state.tasks.length; i++) {
+    for (var i = 1; i < data.state.tasks.length; i++) {
       data.state.tasks[i].tabs = data.state.tasks[i].tabs.filter(function (tab) {
         return !tab.private
       })
@@ -47,15 +47,17 @@ var sessionRestore = {
       }
 
       // add the saved tasks
-
+      hometask = {name:'Accueil'}
+      timopoi = tasks.add(hometask)
       data.state.tasks.forEach(function (task) {
+        if (task.name != 'Accueil')
         // restore the task item
-        tasks.add(task)
+        {tasks.add(task)}
       })
 
       // switch to the previously selected tasks
-
-      switchToTask(data.state.selectedTask)
+      
+      switchToTask(timopoi)
 
       if (currentTask.tabs.isEmpty()) {
         tabBar.enterEditMode(currentTask.tabs.getSelected())

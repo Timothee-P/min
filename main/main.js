@@ -4,13 +4,17 @@ const path = require('path')
 const app = electron.app // Module to control application life.
 const protocol = electron.protocol // Module to control protocol handling
 const BrowserWindow = electron.BrowserWindow // Module to create native browser window.
+
 const ipc = electron.ipcMain
 
 var userDataPath = app.getPath('userData')
+const remote = require('electron').remote;
 
 const browserPage = 'file://' + __dirname + '/index.html'
 
 var mainWindow = null
+var windows1 = null
+var windows2 = null
 var mainMenu = null
 var isFocusMode = false
 var appIsReady = false
@@ -24,21 +28,38 @@ var saveWindowBounds = function () {
 function sendIPCToWindow (window, action, data) {
   // if there are no windows, create a new one
   if (!mainWindow) {
-    createWindow(function () {
+    createWindow('mainWindow', function () {
       mainWindow.webContents.send(action, data || {})
     })
-  } else {
+  }  else if ( window == mainWindow) {
     mainWindow.webContents.send(action, data || {})
+  } else if (!windows1) {
+    createWindow( 'windows1',function () {
+      windows1.webContents.send(action, data || {})
+    })
+  }  else if ( window == windows1) {
+    windows1.webContents.send(action, data || {})
+  } else if (!windows2) {
+    createWindow('windows2',function () {
+      windows2.webContents.send(action, data || {})
+    })
+  } else if ( window == windows2) {
+    windows2.webContents.send(action, data || {})
+  } else {
+    createWindow('mainWindow',function () {
+      mainWindow.webContents.send(action, data || {})
+    })
   }
 }
 
-function openTabInWindow (url) {
-  sendIPCToWindow(mainWindow, 'addTab', {
+function openTabInWindow (window, url) {
+  
+  sendIPCToWindow(window, 'addTab', {
     url: url
   })
 }
 
-function createWindow (cb) {
+function createWindow (wintim, cb) {
   var savedBounds = fs.readFile(path.join(userDataPath, 'windowBounds.json'), 'utf-8', function (e, data) {
     if (e || !data) { // there was an error, probably because the file doesn't exist
       var size = electron.screen.getPrimaryDisplay().workAreaSize
@@ -64,7 +85,7 @@ function createWindow (cb) {
       }
     }
 
-    createWindowWithBounds(bounds, shouldMaximize)
+    createWindowWithBounds(wintim, bounds, shouldMaximize)
 
     if (cb) {
       cb()
@@ -72,97 +93,282 @@ function createWindow (cb) {
   })
 }
 
-function createWindowWithBounds (bounds, shouldMaximize) {
-  mainWindow = new BrowserWindow({
-    width: bounds.width,
-    height: bounds.height,
-    x: bounds.x,
-    y: bounds.y,
-    minWidth: 320,
-    minHeight: 350,
-    titleBarStyle: 'hiddenInset',
-    icon: __dirname + '/icons/icon256.png',
-    frame: process.platform !== 'win32'
-  })
-
-  // and load the index.html of the app.
-  mainWindow.loadURL(browserPage)
-
-  if (shouldMaximize) {
-    mainWindow.maximize()
-
-    mainWindow.webContents.on('did-finish-load', function () {
-      sendIPCToWindow(mainWindow, 'maximize')
+function createWindowWithBounds (wintim, bounds, shouldMaximize) {
+  if (wintim == 'mainWindow'){
+    mainWindow = new BrowserWindow({
+      width: bounds.width,
+      height: bounds.height,
+      x: bounds.x,
+      y: bounds.y,
+      minWidth: 320,
+      minHeight: 350,
+      name:'mainWindow',
+      
+      icon: __dirname + '/icons/icon256.png',
+      frame: false
     })
-  }
 
-  // save the window size for the next launch of the app
-  mainWindow.on('close', function () {
-    saveWindowBounds()
-  })
+    // and load the index.html of the app.
+    mainWindow.loadURL(browserPage)
 
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null
-  })
+    if (shouldMaximize) {
+      mainWindow.maximize()
 
-  /* handle pdf downloads - ipc recieved in fileDownloadManager.js */
-
-  mainWindow.webContents.session.on('will-download', function (event, item, webContents) {
-    var itemURL = item.getURL()
-    if (item.getMimeType() === 'application/pdf' && itemURL.indexOf('blob:') !== 0 && itemURL.indexOf('#pdfjs.action=download') === -1) { // clicking the download button in the viewer opens a blob url, so we don't want to open those in the viewer (since that would make it impossible to download a PDF)
-      event.preventDefault()
-      sendIPCToWindow(mainWindow, 'openPDF', {
-        url: itemURL,
-        webContentsId: webContents.getId(),
-        event: event,
-        item: item // as of electron 0.35.1, this is an empty object
+      mainWindow.webContents.on('did-finish-load', function () {
+        sendIPCToWindow(mainWindow, 'maximize')
       })
     }
-    return true
-  })
 
-  mainWindow.on('minimize', function () {
-    sendIPCToWindow(mainWindow, 'minimize')
-  })
+    // save the window size for the next launch of the app
+    mainWindow.on('close', function () {
+      saveWindowBounds()
+    })
 
-  mainWindow.on('maximize', function () {
-    sendIPCToWindow(mainWindow, 'maximize')
-  })
+    // Emitted when the window is closed.
+    mainWindow.on('closed', function () {
+      // Dereference the window object, usually you would store windows
+      // in an array if your app supports multi windows, this is the time
+      // when you should delete the corresponding element.
+      mainWindow = null
+    })
 
-  mainWindow.on('unmaximize', function () {
-    sendIPCToWindow(mainWindow, 'unmaximize')
-  })
+    /* handle pdf downloads - ipc recieved in fileDownloadManager.js */
 
-  mainWindow.on('enter-full-screen', function () {
-    sendIPCToWindow(mainWindow, 'enter-full-screen')
-  })
+    mainWindow.webContents.session.on('will-download', function (event, item, webContents) {
+      var itemURL = item.getURL()
+      if (item.getMimeType() === 'application/pdf' && itemURL.indexOf('blob:') !== 0 && itemURL.indexOf('#pdfjs.action=download') === -1) { // clicking the download button in the viewer opens a blob url, so we don't want to open those in the viewer (since that would make it impossible to download a PDF)
+        event.preventDefault()
+        sendIPCToWindow(mainWindow, 'openPDF', {
+          url: itemURL,
+          webContentsId: webContents.getId(),
+          event: event,
+          item: item // as of electron 0.35.1, this is an empty object
+        })
+      }
+      return true
+    })
 
-  mainWindow.on('leave-full-screen', function () {
-    sendIPCToWindow(mainWindow, 'leave-full-screen')
-  })
+    mainWindow.on('minimize', function () {
+      sendIPCToWindow(mainWindow, 'minimize')
+    })
 
-  mainWindow.on('app-command', function (e, command) {
-    if (command === 'browser-backward') {
-      sendIPCToWindow(mainWindow, 'goBack')
-    } else if (command === 'browser-forward') {
-      sendIPCToWindow(mainWindow, 'goForward')
+    mainWindow.on('maximize', function () {
+      sendIPCToWindow(mainWindow, 'maximize')
+    })
+
+    mainWindow.on('unmaximize', function () {
+      sendIPCToWindow(mainWindow, 'unmaximize')
+    })
+
+    mainWindow.on('enter-full-screen', function () {
+      sendIPCToWindow(mainWindow, 'enter-full-screen')
+    })
+
+    mainWindow.on('leave-full-screen', function () {
+      sendIPCToWindow(mainWindow, 'leave-full-screen')
+    })
+
+    mainWindow.on('app-command', function (e, command) {
+      if (command === 'browser-backward') {
+        sendIPCToWindow(mainWindow, 'goBack')
+      } else if (command === 'browser-forward') {
+        sendIPCToWindow(mainWindow, 'goForward')
+      }
+    })
+
+    // prevent remote pages from being loaded using drag-and-drop, since they would have node access
+    mainWindow.webContents.on('will-navigate', function (e, url) {
+      if (url !== browserPage) {
+        e.preventDefault()
+      }
+    })
+
+    registerFiltering() // register filtering for the default session
+
+    return mainWindow
+  } else if (wintim == 'windows1'){
+    windows1 = new BrowserWindow({
+      width: bounds.width,
+      height: bounds.height,
+      x: bounds.x,
+      y: bounds.y,
+      minWidth: 320,
+      minHeight: 350,
+      
+      icon: __dirname + '/icons/icon256.png',
+      frame: false
+    })
+
+    // and load the index.html of the app.
+    windows1.loadURL(browserPage)
+
+    if (shouldMaximize) {
+      windows1.maximize()
+
+      windows1.webContents.on('did-finish-load', function () {
+        sendIPCToWindow(windows1, 'maximize')
+      })
     }
-  })
 
-  // prevent remote pages from being loaded using drag-and-drop, since they would have node access
-  mainWindow.webContents.on('will-navigate', function (e, url) {
-    if (url !== browserPage) {
-      e.preventDefault()
+    // save the window size for the next launch of the app
+    windows1.on('close', function () {
+      saveWindowBounds()
+    })
+
+    // Emitted when the window is closed.
+    windows1.on('closed', function () {
+      // Dereference the window object, usually you would store windows
+      // in an array if your app supports multi windows, this is the time
+      // when you should delete the corresponding element.
+      windows1 = null
+    })
+
+    /* handle pdf downloads - ipc recieved in fileDownloadManager.js */
+
+    windows1.webContents.session.on('will-download', function (event, item, webContents) {
+      var itemURL = item.getURL()
+      if (item.getMimeType() === 'application/pdf' && itemURL.indexOf('blob:') !== 0 && itemURL.indexOf('#pdfjs.action=download') === -1) { // clicking the download button in the viewer opens a blob url, so we don't want to open those in the viewer (since that would make it impossible to download a PDF)
+        event.preventDefault()
+        sendIPCToWindow(windows1, 'openPDF', {
+          url: itemURL,
+          webContentsId: webContents.getId(),
+          event: event,
+          item: item // as of electron 0.35.1, this is an empty object
+        })
+      }
+      return true
+    })
+
+    windows1.on('minimize', function () {
+      sendIPCToWindow(windows1, 'minimize')
+    })
+
+    windows1.on('maximize', function () {
+      sendIPCToWindow(windows1, 'maximize')
+    })
+
+    windows1.on('unmaximize', function () {
+      sendIPCToWindow(windows1, 'unmaximize')
+    })
+
+    windows1.on('enter-full-screen', function () {
+      sendIPCToWindow(windows1, 'enter-full-screen')
+    })
+
+    windows1.on('leave-full-screen', function () {
+      sendIPCToWindow(windows1, 'leave-full-screen')
+    })
+
+    windows1.on('app-command', function (e, command) {
+      if (command === 'browser-backward') {
+        sendIPCToWindow(windows1, 'goBack')
+      } else if (command === 'browser-forward') {
+        sendIPCToWindow(windows1, 'goForward')
+      }
+    })
+
+    // prevent remote pages from being loaded using drag-and-drop, since they would have node access
+    windows1.webContents.on('will-navigate', function (e, url) {
+      if (url !== browserPage) {
+        e.preventDefault()
+      }
+    })
+
+    registerFiltering() // register filtering for the default session
+
+    return windows1
+  } else if (wintim == 'windows2'){
+    windows2 = new BrowserWindow({
+      width: bounds.width,
+      height: bounds.height,
+      x: bounds.x,
+      y: bounds.y,
+      minWidth: 320,
+      minHeight: 350,
+      
+      icon: __dirname + '/icons/icon256.png',
+      frame: false
+    })
+
+    // and load the index.html of the app.
+    windows2.loadURL(browserPage)
+
+    if (shouldMaximize) {
+      windows2.maximize()
+
+      windows2.webContents.on('did-finish-load', function () {
+        sendIPCToWindow(windows2, 'maximize')
+      })
     }
-  })
 
-  registerFiltering() // register filtering for the default session
+    // save the window size for the next launch of the app
+    windows2.on('close', function () {
+      saveWindowBounds()
+    })
 
-  return mainWindow
+    // Emitted when the window is closed.
+    windows2.on('closed', function () {
+      // Dereference the window object, usually you would store windows
+      // in an array if your app supports multi windows, this is the time
+      // when you should delete the corresponding element.
+      windows2 = null
+    })
+
+    /* handle pdf downloads - ipc recieved in fileDownloadManager.js */
+
+    windows2.webContents.session.on('will-download', function (event, item, webContents) {
+      var itemURL = item.getURL()
+      if (item.getMimeType() === 'application/pdf' && itemURL.indexOf('blob:') !== 0 && itemURL.indexOf('#pdfjs.action=download') === -1) { // clicking the download button in the viewer opens a blob url, so we don't want to open those in the viewer (since that would make it impossible to download a PDF)
+        event.preventDefault()
+        sendIPCToWindow(windows2, 'openPDF', {
+          url: itemURL,
+          webContentsId: webContents.getId(),
+          event: event,
+          item: item // as of electron 0.35.1, this is an empty object
+        })
+      }
+      return true
+    })
+
+    windows2.on('minimize', function () {
+      sendIPCToWindow(windows2, 'minimize')
+    })
+
+    windows2.on('maximize', function () {
+      sendIPCToWindow(windows2, 'maximize')
+    })
+
+    windows2.on('unmaximize', function () {
+      sendIPCToWindow(windows2, 'unmaximize')
+    })
+
+    windows2.on('enter-full-screen', function () {
+      sendIPCToWindow(windows2, 'enter-full-screen')
+    })
+
+    windows2.on('leave-full-screen', function () {
+      sendIPCToWindow(windows2, 'leave-full-screen')
+    })
+
+    windows2.on('app-command', function (e, command) {
+      if (command === 'browser-backward') {
+        sendIPCToWindow(windows2, 'goBack')
+      } else if (command === 'browser-forward') {
+        sendIPCToWindow(windows2, 'goForward')
+      }
+    })
+
+    // prevent remote pages from being loaded using drag-and-drop, since they would have node access
+    windows2.webContents.on('will-navigate', function (e, url) {
+      if (url !== browserPage) {
+        e.preventDefault()
+      }
+    })
+
+    registerFiltering() // register filtering for the default session
+
+    return windows2
+  } 
 }
 
 // Quit when all windows are closed.
@@ -179,7 +385,7 @@ app.on('window-all-closed', function () {
 app.on('ready', function () {
   appIsReady = true
 
-  createWindow(function () {
+  createWindow('mainWindow', function () {
     mainWindow.webContents.on('did-finish-load', function () {
       // if a URL was passed as a command line argument (probably because Min is set as the default browser on Linux), open it.
       if (process.argv && process.argv[1] && process.argv[1].toLowerCase() !== __dirname.toLowerCase() && process.argv[1].indexOf('://') !== -1) {
@@ -222,8 +428,14 @@ app.on('open-url', function (e, url) {
  */
 app.on('activate', function ( /* e, hasVisibleWindows */) {
   if (!mainWindow && appIsReady) { // sometimes, the event will be triggered before the app is ready, and creating new windows will fail
-    createWindow()
+    
   }
+})
+
+ipc.on('task-window', function (event){
+  console.log('wind ')
+  mainWindow.webContents.send('info-tasks' , 'windowName');
+  
 })
 
 ipc.on('showSecondaryMenu', function (event, data) {
@@ -263,7 +475,9 @@ function createAppMenu () {
           label: l('appMenuNewTab'),
           accelerator: 'CmdOrCtrl+t',
           click: function (item, window) {
-            sendIPCToWindow(window, 'addTab')
+           
+            openTabInWindow(window, "https://google.fr")
+            
           }
         },
         {
@@ -277,7 +491,7 @@ function createAppMenu () {
           label: l('appMenuNewTask'),
           accelerator: 'CmdOrCtrl+n',
           click: function (item, window) {
-            sendIPCToWindow(window, 'addTask')
+            sendIPCToWindow('newwindow', 'addTask')
           }
         },
         {

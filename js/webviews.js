@@ -15,6 +15,7 @@ remote.session.defaultSession.setPermissionRequestHandler(pagePermissionRequestH
 
 // called whenever the page url changes
 
+
 function onPageLoad (e) {
   var _this = this
   setTimeout(function () { // TODO convert to arrow function
@@ -106,11 +107,27 @@ var webviews = {
         w.addEventListener(ev.event, ev.fn)
       }
     })
+    
+    w.addEventListener("dom-ready", function() {
+      var tab = this.getAttribute('data-tab')
+      var url = tabs.get(tab).url
+      
 
-    w.addEventListener('page-favicon-updated', function (e) {
-      var id = this.getAttribute('data-tab')
-      updateTabColor(e.favicons, id)
+      if (url.indexOf("youtube") <= -1){
+      w.send("timhetic");}
+      else {
+        updateTabColor('rgb(35,35,35)', tab,'white')
+      }
+      
+      
     })
+    
+    w.addEventListener('page-favicon-updated', function (e) {
+      
+      });    
+      
+      
+  
 
     w.addEventListener('page-title-set', function (e) {
       var tab = this.getAttribute('data-tab')
@@ -120,7 +137,7 @@ var webviews = {
       tabBar.rerenderTab(tab)
     })
 
-    w.addEventListener('did-finish-load', onPageLoad)
+    w.addEventListener('did-finish-load',onPageLoad)
     w.addEventListener('did-navigate-in-page', onPageLoad)
 
     w.addEventListener('load-commit', function (e) {
@@ -132,7 +149,8 @@ var webviews = {
       this.setAttribute('last-load-event', Date.now().toString())
     })
 
-    w.addEventListener('did-stop-loading', function () {
+    w.addEventListener('did-stop-loading', function (ef) {
+      
       tabBar.handleProgressBar(this.getAttribute('data-tab'), 'finish')
 
       this.setAttribute('last-load-event', Date.now().toString())
@@ -164,15 +182,23 @@ var webviews = {
       closeTab(this.getAttribute('data-tab'))
     })
 
+    
     w.addEventListener('ipc-message', function (e) {
       var w = this
       var tab = this.getAttribute('data-tab')
+      if (e.channel  == 'pong')
+      {var colo = e.args[0]
+        var colo1 = e.args[1]
+      updateTabColor(colo, tab, colo1)
+      console.log(tabs.get(tab))
 
+    } else{
       webviews.IPCEvents.forEach(function (item) {
         if (item.name === e.channel) {
           item.fn(w, tab, e.args)
         }
       })
+    }
     })
 
     w.addEventListener('crashed', function (e) {

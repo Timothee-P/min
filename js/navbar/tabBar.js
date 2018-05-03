@@ -32,7 +32,14 @@ var tabBar = {
     enterEditMode: function (tabId, editingValue) {
         // editingValue: an optional string to show in the searchbar instead of the current URL
         taskOverlay.hide()
-
+        
+        var timpoin= document.getElementById("navbar");
+        var timbispoin = document.getElementById("webviews");
+        timpoin.style.transition = '0'
+        timbispoin.style.transition = '0'
+        timpoin.style.transform = 'translateY(36px)';
+        timbispoin.style.height = 'calc( 100vh - 36px )';
+        topbarAfficher = true;
         var tabEl = tabBar.getTab(tabId)
         var webview = webviews.get(tabId)
 
@@ -68,6 +75,11 @@ var tabBar = {
         }
     },
     leaveEditMode: function (options) {
+        var timpoin= document.getElementById("navbar");
+        var timbispoin = document.getElementById("webviews");
+        timpoin.style.transform = 'translateY(0px)';
+        timbispoin.style.height = 'calc( 100vh)';
+        topbarAfficher = false; 
         var selTab = document.querySelector('.tab-item.selected')
         if (selTab) {
             selTab.classList.remove('selected')

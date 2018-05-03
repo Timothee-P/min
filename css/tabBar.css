@@ -5,10 +5,12 @@
 	align-items: center;
 	transition: 0.2s background-color;
 	max-width: 100vw;
+	top:-36px;
 	-webkit-user-select: none;
 	position: relative;
 	outline: none;
 	z-index: 2;
+	
 }
 
 /* window drag regions */

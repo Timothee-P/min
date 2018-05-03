@@ -20,6 +20,7 @@ ipc.on('print', function () {
   }
 })
 
+
 ipc.on('findInPage', function () {
   findinpage.start()
 })

@@ -2,8 +2,9 @@
 <html>
 
 <head>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
 	<meta charset="UTF-8">
-	<meta http-equiv="Content-Security-Policy" content="script-src 'self'" />
+	<meta http-equiv="Content-Security-Policy" content="script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js" />
 
 	<title>Min</title>
 
@@ -20,7 +21,7 @@
 
 <body>
 
-	<i id="switch-task-button" class="fa fa-bars navbar-action-button theme-text-color windowDragHandle"></i>
+	
 
 	<div class="windows-drag-area"></div>
 	<div class="windows-caption-buttons">
@@ -48,11 +49,12 @@
 	</div>
 
 	<div id="navbar" class="theme-background-color theme-text-color windowDragHandle" tabindex="-1">
-		<i id="menu-button" class="fa fa-ellipsis-v navbar-action-button"></i>
-		<i id="back-button" hidden class="fa fa-angle-left navbar-action-button"></i>
+		<i id="menu-button" class="fa fa-ellipsis-v navbar-action-button" style="display:none" ></i>
+		<i id="back-button" hidden class="fa fa-angle-left navbar-action-button" style="display:none"></i>
 		<div id="tabs"></div>
 		<i id="add-tab-button" class="fa fa-plus navbar-action-button"></i>
 		<i class="fa fa-bars navbar-action-button invisible"></i>
+		<i id="switch-task-button" class="fa fa-bars navbar-action-button theme-text-color windowDragHandle" ></i>
 	</div>
 
 	<div id="searchbar" class="theme-background-color theme-text-color">
@@ -62,6 +64,7 @@
 	<div id="overlay"></div>
 
 	<div id="webviews">
+		
 		<div id="leftArrowContainer" class="arrow-indicator">
 			<i id="leftArrow" class="fa fa-arrow-left arrow"></i>
 		</div>
@@ -94,6 +97,8 @@
 	<!-- add scripts in Gruntfile.js -->
 
 	<script src="dist/build.min.js"></script>
+	<script src="js/tiim.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
 
 </body>
 

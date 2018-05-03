@@ -5,15 +5,18 @@
   "electronVersion": "2.0.0-beta.4",
   "main": "main.build.js",
   "dependencies": {
+    "appdmg": "^0.5.2",
     "dexie": "^1.2.0",
     "dragula": "^3.6.2",
+    "html2canvas": "^1.0.0-alpha.12",
     "mousetrap": "^1.5.3",
     "pdfjs-dist": "2.0.91",
     "string_score": "^0.1.22"
   },
   "devDependencies": {
     "decomment": "^0.9.0",
-    "electron": "^2.0.0-beta.6",
+    "electron": "^1.8.4",
+    "electron-installer-dmg": "^0.2.1",
     "grunt": "^1.0.1",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-uglify": "^2.0.0",

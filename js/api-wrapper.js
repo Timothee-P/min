@@ -125,7 +125,8 @@ function closeTab (tabId) {
     if (nextTab) {
       switchToTab(nextTab.id)
     } else {
-      addTab()
+      var window = remote.getCurrentWindow();
+       window.close();
     }
   } else {
     destroyTab(tabId)

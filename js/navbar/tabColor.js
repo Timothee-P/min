@@ -74,8 +74,8 @@ var colorExtractorImage = document.createElement('img')
 
 const defaultColors = {
   private: ['rgb(58, 44, 99)', 'white'],
-  lightMode: ['rgb(255, 255, 255)', 'black'],
-  darkMode: ['rgb(40, 44, 52)', 'white']
+  lightMode: ['rgb(0, 0, 0)', 'white'],
+  darkMode: ['rgb(0, 0, 0)', 'white']
 }
 
 var hours = new Date().getHours() + (new Date().getMinutes() / 60)
@@ -87,49 +87,25 @@ setInterval(function () {
   hours = d.getHours() + (d.getMinutes() / 60)
 }, 4 * 60 * 1000)
 
-function updateTabColor (favicons, tabId) {
+function updateTabColor (cr, tabId, ct) {
   // private tabs always use a special color, we don't need to get the icon
   if (tabs.get(tabId).private === true) {
     return
   }
   requestIdleCallback(function () {
-    getColor(favicons[0], function (c) {
-      // dim the colors late at night or early in the morning, or when dark mode is enabled
-      var colorChange = 1
-      if (hours > 20) {
-        colorChange -= 0.015 * Math.pow(2.75, hours - 20)
-      } else if (hours < 6.5) {
-        colorChange -= -0.15 * Math.pow(1.36, hours) + 1.15
-      }
-
-      if (window.isDarkMode) {
-        colorChange = Math.min(colorChange, 0.58)
-      }
-
-      c[0] = Math.round(c[0] * colorChange)
-      c[1] = Math.round(c[1] * colorChange)
-      c[2] = Math.round(c[2] * colorChange)
-
-      var cr = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')'
-
-      var obj = {
-        r: c[0] / 255,
-        g: c[1] / 255,
-        b: c[2] / 255
-      }
-
-      var textclr = getTextColor(obj)
-
+      //var tilo = getTextColor(cr)
+      
       tabs.update(tabId, {
         backgroundColor: cr,
-        foregroundColor: textclr
+        foregroundColor: ct
       })
 
       if (tabId === tabs.getSelected()) {
+        console.log('tttt')
         updateColorPalette()
       }
       return
-    })
+    
   }, {
     timeout: 1000
   })
@@ -137,12 +113,15 @@ function updateTabColor (favicons, tabId) {
 
 // generated using http://harthur.github.io/brain/
 var getTextColor = function (bgColor) {
+  if (bgColor == 'rgb(255,255,255)'){
+    return 'black'
+  } else {
   var output = runNetwork(bgColor)
   if (output.black > 0.5) {
     return 'black'
   }
   return 'white'
-}
+}}
 
 var runNetwork = function anonymous (input) {
   var net = {

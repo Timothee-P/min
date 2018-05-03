@@ -3,7 +3,7 @@ var taskSwitcherButton = document.getElementById('switch-task-button')
 var addTaskButton = document.getElementById('add-task')
 var addTaskLabel = addTaskButton.querySelector('span')
 var taskOverlayNavbar = document.getElementById('task-overlay-navbar')
-
+window.ipc = electron.ipcRenderer
 taskSwitcherButton.title = l('viewTasks')
 addTaskLabel.textContent = l('newTask')
 
@@ -21,6 +21,11 @@ taskOverlayNavbar.addEventListener('click', function () {
 })
 
 var dragula = require('dragula')
+
+window.ipc.on('info-tasks', function (event, arg){
+  window.ipc.send('task-window-respond', tasks)
+  
+});
 
 var taskOverlay = {
   overlayElement: document.getElementById('task-overlay'),
@@ -60,7 +65,10 @@ var taskOverlay = {
 
     this.tabDragula.containers = []
     empty(taskContainer)
+    
 
+    window.ipc.send('task-window')
+    console.log('dddd')
     // show the task elements
     tasks.get().forEach(function (task, index) {
       var el = window.task_container_build_func(task, index)
