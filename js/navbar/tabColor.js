@@ -101,7 +101,7 @@ function updateTabColor (cr, tabId, ct) {
       })
 
       if (tabId === tabs.getSelected()) {
-        console.log('tttt')
+        
         updateColorPalette()
       }
       return

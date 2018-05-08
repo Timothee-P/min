@@ -22,7 +22,7 @@ document.onmousemove = function(e){
         if (tempX >= 172){
             topbarAfficher1 = false
         }
-    } else if (tempX <= 100){ 
+    } else if (tempX <= 15){ 
         tim.style.transition = '.2s ease-in-out'
         timbis.style.transition = '.2s ease-in-out'
         tim.style.transform = 'translateY(36px)'
@@ -39,12 +39,12 @@ document.onmousemove = function(e){
 };
 
 document.onmouseleave = function(e){
-    setTimeout(function (){
+
         if (topbarAfficher == false){
             tim.style.transform = 'translateY(0px)'
             timbis.style.height = 'calc( 100vh )'
         }
-    },1000)
+   
     
 }
 

@@ -1,5 +1,5 @@
 /* implements selecting webviews, switching between them, and creating new ones. */
-
+var ipc =require('electron').ipcRenderer;
 // the permissionRequestHandler used for webviews
 function pagePermissionRequestHandler (webContents, permission, callback) {
   if (permission === 'notifications' || permission === 'fullscreen') {
@@ -14,7 +14,11 @@ function pagePermissionRequestHandler (webContents, permission, callback) {
 remote.session.defaultSession.setPermissionRequestHandler(pagePermissionRequestHandler)
 
 // called whenever the page url changes
-
+var getLocation = function(href) {
+  var l = document.createElement("a");
+  l.href = href;
+  return l;
+};
 
 function onPageLoad (e) {
   var _this = this
@@ -95,7 +99,7 @@ var webviews = {
     }
 
     // webview events
-
+    
     webviews.events.forEach(function (ev) {
       if (ev.useWebContents) { // some events (such as context-menu) are only available on the webContents rather than the webview element
         w.addEventListener('did-attach', function () {
@@ -107,20 +111,34 @@ var webviews = {
         w.addEventListener(ev.event, ev.fn)
       }
     })
-    
+    ipc.on('store-data', function (store) {
+      console.log(store);
+    });
     w.addEventListener("dom-ready", function() {
+      
       var tab = this.getAttribute('data-tab')
       var url = tabs.get(tab).url
+      var l = getLocation(url)
       
-
-      if (url.indexOf("youtube") <= -1){
-      w.send("timhetic");}
-      else {
-        updateTabColor('rgb(35,35,35)', tab,'white')
-      }
+      ipc.send("timpoi55", l.hostname, tab)
       
       
-    })
+      
+      })
+      ipc.on('trololo',function(e,urlHeader,tab){
+       
+        if (urlHeader == true){
+          updateTabColor('rgb(35,35,35)', tab,'white')
+        } else {
+          w.send("timhetic", {
+            async: true}
+          )
+        }
+           
+          })
+      
+      
+    
     
     w.addEventListener('page-favicon-updated', function (e) {
       
@@ -188,9 +206,9 @@ var webviews = {
       var tab = this.getAttribute('data-tab')
       if (e.channel  == 'pong')
       {var colo = e.args[0]
-        var colo1 = e.args[1]
+      var colo1 = e.args[1]
       updateTabColor(colo, tab, colo1)
-      console.log(tabs.get(tab))
+      
 
     } else{
       webviews.IPCEvents.forEach(function (item) {

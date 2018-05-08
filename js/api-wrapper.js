@@ -1,7 +1,6 @@
 /* common actions that affect different parts of the UI (webviews, tabstrip, etc) */
 
 /* loads a page in a webview */
-
 function navigate (tabId, newURL) {
   newURL = urlParser.parse(newURL)
 
@@ -17,6 +16,8 @@ function navigate (tabId, newURL) {
 }
 
 /* creates a new task */
+
+
 
 function addTask () {
   tasks.setSelected(tasks.add())

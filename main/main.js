@@ -5,7 +5,7 @@ const app = electron.app // Module to control application life.
 const protocol = electron.protocol // Module to control protocol handling
 const BrowserWindow = electron.BrowserWindow // Module to create native browser window.
 
-const ipc = electron.ipcMain
+const ipc= electron.ipcMain
 
 var userDataPath = app.getPath('userData')
 const remote = require('electron').remote;
@@ -19,11 +19,37 @@ var mainMenu = null
 var isFocusMode = false
 var appIsReady = false
 
+
+
+ipc.on('request-URL-list', function (e,myObj){
+  saveSiteURLHeader(myObj.arg1)
+})
+ipc.on('timpoi55', function (e, l, tab){
+  var urlHeader =false
+  var data  = JSON.parse(fs.readFileSync(path.join(userDataPath, 'listeURL.json'), 'utf8'));
+  data.items.forEach(function(item){
+    if (item.url == l){
+      urlHeader = true
+    }
+  })
+  e.sender.send('trololo', urlHeader, tab)
+})
+
 var saveWindowBounds = function () {
   if (mainWindow) {
     fs.writeFile(path.join(userDataPath, 'windowBounds.json'), JSON.stringify(mainWindow.getBounds()))
   }
 }
+
+var saveSiteURLHeader = function(myObj) {
+  var data  = JSON.parse(fs.readFileSync(path.join(userDataPath, 'listeURL.json'), 'utf8'));
+  
+ 
+  data.items.push({url: myObj}) 
+
+  fs.writeFile(path.join(userDataPath, 'listeURL.json'), JSON.stringify(data))
+}
+
 
 function sendIPCToWindow (window, action, data) {
   // if there are no windows, create a new one
@@ -433,10 +459,11 @@ app.on('activate', function ( /* e, hasVisibleWindows */) {
 })
 
 ipc.on('task-window', function (event){
-  console.log('wind ')
   mainWindow.webContents.send('info-tasks' , 'windowName');
   
 })
+
+
 
 ipc.on('showSecondaryMenu', function (event, data) {
   if (mainMenu) {
@@ -475,7 +502,7 @@ function createAppMenu () {
           label: l('appMenuNewTab'),
           accelerator: 'CmdOrCtrl+t',
           click: function (item, window) {
-           
+            console.log(app.getLocale())
             openTabInWindow(window, "https://google.fr")
             
           }
