@@ -20,7 +20,7 @@ function showPlaceSuggestions (text, input, event, container) {
       return tabList.indexOf(item.url) === -1
     })
 
-    results.slice(0, 4).forEach(function (result) {
+    results.slice(0, 0).forEach(function (result) {
       var item = createSearchbarItem({
         title: urlParser.prettyURL(result.url),
         secondaryText: getRealTitle(result.title),

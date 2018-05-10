@@ -13,6 +13,7 @@ var tabPrototype = {
       id: tabId,
       lastActivity: tab.lastActivity || Date.now(),
       secure: tab.secure,
+      copyHeader: false,
       private: tab.private || false,
       readerable: tab.readerable || false,
       backgroundColor: tab.backgroundColor,
@@ -109,6 +110,7 @@ var tabPrototype = {
     for (var i = 0; i < this.length; i++) {
       if (this[i].id === id) {
         this[i].selected = true
+        topbarAfficher = true;
       } else {
         this[i].selected = false
       }

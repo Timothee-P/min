@@ -4,6 +4,7 @@ var tabBar = {
     container: document.getElementById('tabs'),
     tabElementMap: {}, //tabId: tab element
     getTab: function (tabId) {
+        
         return tabBar.tabElementMap[tabId]
     },
     getTabInput: function (tabId) {

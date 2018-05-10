@@ -24,16 +24,7 @@ var appIsReady = false
 ipc.on('request-URL-list', function (e,myObj){
   saveSiteURLHeader(myObj.arg1)
 })
-ipc.on('timpoi55', function (e, l, tab){
-  var urlHeader =false
-  var data  = JSON.parse(fs.readFileSync(path.join(userDataPath, 'listeURL.json'), 'utf8'));
-  data.items.forEach(function(item){
-    if (item.url == l){
-      urlHeader = true
-    }
-  })
-  e.sender.send('trololo', urlHeader, tab)
-})
+
 
 var saveWindowBounds = function () {
   if (mainWindow) {
@@ -502,7 +493,7 @@ function createAppMenu () {
           label: l('appMenuNewTab'),
           accelerator: 'CmdOrCtrl+t',
           click: function (item, window) {
-            console.log(app.getLocale())
+            
             openTabInWindow(window, "https://google.fr")
             
           }

@@ -1,7 +1,7 @@
 /* implements selecting webviews, switching between them, and creating new ones. */
-var ipc =require('electron').ipcRenderer;
+var ipc = require('electron').ipcRenderer;
 // the permissionRequestHandler used for webviews
-function pagePermissionRequestHandler (webContents, permission, callback) {
+function pagePermissionRequestHandler(webContents, permission, callback) {
   if (permission === 'notifications' || permission === 'fullscreen') {
     callback(true)
   } else {
@@ -14,20 +14,22 @@ function pagePermissionRequestHandler (webContents, permission, callback) {
 remote.session.defaultSession.setPermissionRequestHandler(pagePermissionRequestHandler)
 
 // called whenever the page url changes
-var getLocation = function(href) {
+var getLocation = function (href) {
   var l = document.createElement("a");
   l.href = href;
   return l;
 };
 
-function onPageLoad (e) {
+function onPageLoad(e) {
   var _this = this
   setTimeout(function () { // TODO convert to arrow function
     /* add a small delay before getting these attributes, because they don't seem to update until a short time after the did-finish-load event is fired. Fixes #320 */
 
     var tab = _this.getAttribute('data-tab')
     var url = _this.getAttribute('src') // src attribute changes whenever a page is loaded
-
+    
+     
+      
     // if the page is an error page, the URL is really the value of the "url" query parameter
     if (url.startsWith(webviews.internalPages.error) || url.startsWith(webviews.internalPages.crash)) {
       url = new URLSearchParams(new URL(url).search).get('url')
@@ -46,6 +48,7 @@ function onPageLoad (e) {
     }
 
     tabBar.rerenderTab(tab)
+    
   }, 0)
 }
 
@@ -71,6 +74,8 @@ var webviews = {
       fn: fn
     })
   },
+
+
   getDOM: function (options) {
     var w = document.createElement('webview')
     w.setAttribute('preload', 'dist/webview.min.js')
@@ -101,6 +106,7 @@ var webviews = {
     // webview events
     
     webviews.events.forEach(function (ev) {
+      console.log(ev)
       if (ev.useWebContents) { // some events (such as context-menu) are only available on the webContents rather than the webview element
         w.addEventListener('did-attach', function () {
           this.getWebContents().on(ev.event, function () {
@@ -114,38 +120,36 @@ var webviews = {
     ipc.on('store-data', function (store) {
       console.log(store);
     });
-    w.addEventListener("dom-ready", function() {
-      
-      var tab = this.getAttribute('data-tab')
-      var url = tabs.get(tab).url
-      var l = getLocation(url)
-      
-      ipc.send("timpoi55", l.hostname, tab)
+    w.addEventListener("dom-ready", function () {
       
       
+
       
-      })
-      ipc.on('trololo',function(e,urlHeader,tab){
-       
-        if (urlHeader == true){
-          updateTabColor('rgb(35,35,35)', tab,'white')
-        } else {
-          w.send("timhetic", {
-            async: true}
-          )
-        }
-           
-          })
+      
+
+      
+      
+     
+    });
       
       
     
+      
     
-    w.addEventListener('page-favicon-updated', function (e) {
-      
-      });    
       
       
-  
+      
+
+
+
+
+
+
+    w.addEventListener('page-favicon-updated', function (e) {})
+      
+
+
+
 
     w.addEventListener('page-title-set', function (e) {
       var tab = this.getAttribute('data-tab')
@@ -155,10 +159,31 @@ var webviews = {
       tabBar.rerenderTab(tab)
     })
 
-    w.addEventListener('did-finish-load',onPageLoad)
-    w.addEventListener('did-navigate-in-page', onPageLoad)
+    w.addEventListener('did-finish-load', onPageLoad)
 
+    w.addEventListener('did-finish-load', function(){
+      console.log('tessst')
+      var _this = this
+      setTimeout(function (){ 
+
+        var tab = _this.getAttribute('data-tab')
+        webviews1.add(tab)
+      },0)
+    })
+    w.addEventListener('did-navigate-in-page', onPageLoad)
+  
+    
+    
+   
+    
+    
+   
     w.addEventListener('load-commit', function (e) {
+   
+
+      
+      
+     
       if (e.isMainFrame) {
         tabBar.handleProgressBar(this.getAttribute('data-tab'), 'start')
       }
@@ -168,7 +193,7 @@ var webviews = {
     })
 
     w.addEventListener('did-stop-loading', function (ef) {
-      
+
       tabBar.handleProgressBar(this.getAttribute('data-tab'), 'finish')
 
       this.setAttribute('last-load-event', Date.now().toString())
@@ -200,23 +225,25 @@ var webviews = {
       closeTab(this.getAttribute('data-tab'))
     })
 
-    
+
     w.addEventListener('ipc-message', function (e) {
+
       var w = this
       var tab = this.getAttribute('data-tab')
-      if (e.channel  == 'pong')
-      {var colo = e.args[0]
-      var colo1 = e.args[1]
-      updateTabColor(colo, tab, colo1)
-      
+      if (e.channel == 'pong') {
+        var colo = e.args[0]
+        var colo1 = e.args[1]
+        console.log('pppp')
+        updateTabColor(colo, tab, colo1)
 
-    } else{
-      webviews.IPCEvents.forEach(function (item) {
-        if (item.name === e.channel) {
-          item.fn(w, tab, e.args)
-        }
-      })
-    }
+
+      } else {
+        webviews.IPCEvents.forEach(function (item) {
+          if (item.name === e.channel) {
+            item.fn(w, tab, e.args)
+          }
+        })
+      }
     })
 
     w.addEventListener('crashed', function (e) {
@@ -252,13 +279,18 @@ var webviews = {
 
     return w
   },
+
+
   add: function (tabId) {
     var tabData = tabs.get(tabId)
 
     var webview = webviews.getDOM({
       tabId: tabId,
-      url: tabData.url
+      url: tabData.url,
+      copyHeader:false,
     })
+    
+
 
     webviews.elementMap[tabId] = webview
 
@@ -303,6 +335,10 @@ var webviews = {
     return webviews.elementMap[id]
   }
 }
+
+
+
+
 
 // called when js/webview/textExtractor.js returns the page's text content
 webviews.bindIPC('pageData', function (webview, tabId, args) {
@@ -370,3 +406,202 @@ webviews.bindEvent('did-get-redirect-request', function (e, oldURL, newURL, isMa
     }, 0)
   }
 }, true)
+
+
+var webviews1 = {
+  container: document.getElementById('webviews'),
+  elementMap: {}, // tabId: webview
+  internalPages: {
+    crash: 'file://' + __dirname + '/pages/crash/index.html',
+    error: 'file://' + __dirname + '/pages/error/index.html'
+  },
+  events: [],
+  IPCEvents: [],
+  bindEvent: function (event, fn, useWebContents) {
+    webviews1.events.push({
+      event: event,
+      fn: fn,
+      useWebContents: useWebContents
+    })
+  },
+  bindIPC: function (name, fn) {
+    webviews1.IPCEvents.push({
+      name: name,
+      fn: fn
+    })
+  },
+
+
+  getDOM: function (options) {
+    var w = document.createElement('webview')
+    w.setAttribute('preload', 'dist/webview1.js')
+
+    if (options.url) {
+      w.setAttribute('src', urlParser.parse(options.url))
+    }
+
+    w.setAttribute('data-tab', options.tabId)
+
+    
+
+    // webview events
+    
+    webviews1.events.forEach(function (ev) {
+      console.log(ev)
+      if (ev.useWebContents) { // some events (such as context-menu) are only available on the webContents rather than the webview element
+        w.addEventListener('did-attach', function () {
+          this.getWebContents().on(ev.event, function () {
+            ev.fn.apply(w, arguments)
+          })
+        })
+      } else {
+        w.addEventListener(ev.event, ev.fn)
+      }
+    })
+    ipc.on('store-data', function (store) {
+      console.log(store);
+    });
+    w.addEventListener("dom-ready", function () {
+      var tab = this.getAttribute('data-tab')
+      var url = tabs.get(tab).url
+      var l = getLocation(url)
+      w.send('timhetic')
+      
+      
+      
+      
+      
+    })
+      
+
+      
+      
+      
+
+    
+
+
+
+    
+
+   
+
+    
+    w.addEventListener('close', function (e) {
+      closeTab(this.getAttribute('data-tab'))
+    })
+
+
+    w.addEventListener('ipc-message', function (e) {
+
+      var w = this
+      var tab = this.getAttribute('data-tab')
+      if (e.channel == 'pong') {
+        var colo = e.args[0]
+        var colo1 = e.args[1]
+        console.log(tabs)
+        updateTabColor(colo, tab, colo1)
+        webviews1.destroy(tab)
+
+
+      } else {
+        webviews1.IPCEvents.forEach(function (item) {
+          if (item.name === e.channel) {
+            item.fn(w, tab, e.args)
+          }
+        })
+      }
+    })
+
+    w.addEventListener('crashed', function (e) {
+      var tabId = this.getAttribute('data-tab')
+      var url = this.getAttribute('src')
+
+      tabs.update(tabId, {
+        url: webviews1.internalPages.crash + '?url=' + encodeURIComponent(url)
+      })
+
+      // the existing process has crashed, so we can't reuse it
+      webviews1.destroy(tabId)
+      webviews1.add(tabId)
+
+      if (tabId === tabs.getSelected()) {
+        webviews1.setSelected(tabId)
+      }
+    })
+
+    w.addEventListener('did-fail-load', function (e) {
+      if (e.errorCode !== -3 && e.validatedURL === e.target.getURL()) {
+        navigate(this.getAttribute('data-tab'), webviews1.internalPages.error + '?ec=' + encodeURIComponent(e.errorCode) + '&url=' + encodeURIComponent(e.target.getURL()))
+      }
+    })
+
+
+    return w
+  },
+
+
+  add: function (tabId) {
+    
+    var tabData = tabs.get(tabId)
+
+    var webview = webviews1.getDOM({
+      tabId: tabId,
+      url: tabData.url,
+      
+    })
+    setTimeout(function (){
+      if (webviews1.get(tabId)){
+      
+        webviews1.destroy(tabId)
+        updateTabColor("black", tabId, "red")
+      }
+      
+    }, 25000)
+    
+
+
+    webviews1.elementMap[tabId] = webview
+
+    // this is used to hide the webview while still letting it load in the background
+    // webviews1 are hidden when added - call webviews1.setSelected to show it
+    webview.classList.add('hidden')
+    webview.classList.add('loading')
+
+    webviews1.container.appendChild(webview)
+
+    return webview
+  },
+  setSelected: function (id) {
+    var webviewEls = document.getElementsByTagName('webview')
+    for (var i = 0; i < webviewEls.length; i++) {
+      webviewEls[i].classList.add('hidden')
+    }
+
+    var wv = webviews1.get(id)
+
+    if (!wv) {
+      wv = webviews1.add(id)
+    }
+
+    wv.classList.remove('hidden')
+  },
+  update: function (id, url) {
+    webviews1.get(id).setAttribute('src', urlParser.parse(url))
+  },
+  
+  destroy: function (id) {
+    var w = webviews1.elementMap[id]
+    if (w) {
+      var partition = w.getAttribute('partition')
+      if (partition) {
+        remote.session.fromPartition(partition).destroy()
+      }
+      w.parentNode.removeChild(w)
+    }
+    delete webviews1.elementMap[id]
+  },
+  get: function (id) {
+    return webviews1.elementMap[id]
+  }
+}
