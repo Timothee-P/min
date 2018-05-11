@@ -93,7 +93,7 @@ function showSearchbarPlaceResults (text, input, event, container, options) {
 }
 
 registerSearchbarPlugin('places', {
-  index: 1,
+  index: 2,
   trigger: function (text) {
     return !!text && text.indexOf('!') !== 0
   },
@@ -101,7 +101,7 @@ registerSearchbarPlugin('places', {
 })
 
 registerSearchbarPlugin('fullTextPlaces', {
-  index: 2,
+  index: 3,
   trigger: function (text) {
     return !!text && text.indexOf('!') !== 0
   },

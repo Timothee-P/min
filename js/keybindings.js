@@ -51,7 +51,7 @@ ipc.on('addTab', function (e, data) {
     }, newIndex)
 
     addTab(newTab, {
-      enterEditMode: !data.url // only enter edit mode if the new tab is about:blank
+      enterEditMode: false // only enter edit mode if the new tab is about:blank
     })
   }
 })

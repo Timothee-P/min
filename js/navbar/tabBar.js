@@ -34,13 +34,13 @@ var tabBar = {
         // editingValue: an optional string to show in the searchbar instead of the current URL
         taskOverlay.hide()
         
-        var timpoin= document.getElementById("navbar");
-        var timbispoin = document.getElementById("webviews");
-        timpoin.style.transition = '0'
-        timbispoin.style.transition = '0'
-        timpoin.style.transform = 'translateY(36px)';
-        timbispoin.style.height = 'calc( 100vh - 36px )';
-        topbarAfficher = true;
+        //var timpoin= document.getElementById("navbar");
+        //var timbispoin = document.getElementById("webviews");
+        //timpoin.style.transition = '0'
+        //timbispoin.style.transition = '0'
+        //timpoin.style.transform = 'translateY(36px)';
+        //timbispoin.style.height = 'calc( 100vh - 36px )';
+        //topbarAfficher = true;
         var tabEl = tabBar.getTab(tabId)
         var webview = webviews.get(tabId)
 
@@ -60,7 +60,16 @@ var tabBar = {
         if (!editingValue) {
             input.select()
         }
-
+        settings.get('headerTop', function (value) {
+            if (value === true) {
+                var tim = document.getElementById("navbar")
+                var timbis = document.getElementById("webviews")
+                tim.style.transition = '0s'
+                timbis.style.transition = '0s'
+                tim.style.transform = 'translateY(36px)'
+                timbis.style.height = 'calc( 100vh - 36px )'
+                topbarAfficher = true
+            }})        
         showSearchbar(input)
 
         if (editingValue) {
@@ -76,11 +85,11 @@ var tabBar = {
         }
     },
     leaveEditMode: function (options) {
-        var timpoin= document.getElementById("navbar");
-        var timbispoin = document.getElementById("webviews");
-        timpoin.style.transform = 'translateY(0px)';
-        timbispoin.style.height = 'calc( 100vh)';
-        topbarAfficher = false; 
+        //var timpoin= document.getElementById("navbar");
+        //var timbispoin = document.getElementById("webviews");
+        //timpoin.style.transform = 'translateY(0px)';
+        //timbispoin.style.height = 'calc( 100vh)';
+        //topbarAfficher = false; 
         var selTab = document.querySelector('.tab-item.selected')
         if (selTab) {
             selTab.classList.remove('selected')
@@ -92,6 +101,16 @@ var tabBar = {
             }
         }
 
+        settings.get('headerTop', function (value) {
+            if (value === true) {
+                var tim = document.getElementById("navbar")
+                var timbis = document.getElementById("webviews")
+                tim.style.transition = '.3s ease-in-out'
+                timbis.style.transition = '.2s ease-in-out'
+                tim.style.transform = 'translateY(0)'
+                timbis.style.height = 'calc( 100vh)'
+                topbarAfficher = false
+            }})  
         document.body.classList.remove('is-edit-mode')
         hidesearchbar()
     },
@@ -281,7 +300,7 @@ var tabBar = {
         // click to enter edit mode or switch to a tab
         tabEl.addEventListener('click', function (e) {
             if (tabs.getSelected() !== data.id) { // else switch to tab if it isn't focused
-                switchToTab(data.id)
+                switchToTab1(data.id)
             } else { // the tab is focused, edit tab instead
                 tabBar.enterEditMode(data.id)
             }

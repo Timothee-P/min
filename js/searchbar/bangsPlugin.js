@@ -150,7 +150,7 @@ function getBangSearchResults (text, input, event, container) {
 }
 
 registerSearchbarPlugin('bangs', {
-  index: 1,
+  index: 6,
   trigger: function (text) {
     return !!text && text.indexOf('!') === 0
   },

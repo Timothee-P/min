@@ -1,13 +1,17 @@
 #webviews {
-	height: 100vh;
+	height: calc( 100vh - 36px );
 	position: absolute;
 	bottom:0;
 	width:100vw;
 	z-index: 1;
-	
-
 
 }
+
+.hide-header #webviews {
+	height: 100vh;
+}
+
+
 body.windows #webviews {
 	height: calc(100vh - 46px);
 }

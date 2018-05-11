@@ -36,7 +36,7 @@ function showPlaceSuggestions (text, input, event, container) {
 }
 
 registerSearchbarPlugin('placeSuggestions', {
-  index: 1,
+  index: 5,
   trigger: function (text) {
     return !text
   },

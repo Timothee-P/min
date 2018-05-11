@@ -2,14 +2,9 @@ var ddgAttribution = l('resultsFromDDG')
 
 function showSearchSuggestions (text, input, event, container) {
   // TODO support search suggestions for other search engines
-  if (currentSearchEngine.name == 'DuckDuckGo') {
-    return
-  }
 
-  if (searchbarResultCount > 3) {
-    empty(container)
-    return
-  }
+
+  
 
   fetch('http://suggestqueries.google.com/complete/search?output=firefox&hl=en&q=' + encodeURIComponent(text), {
     cache: 'force-cache'
@@ -19,7 +14,7 @@ function showSearchSuggestions (text, input, event, container) {
       return response.json()
     })
     .then(function (results) {
-      console.log(results)
+      
       empty(container)
 
       if (results) {
@@ -84,7 +79,7 @@ function showSearchSuggestions (text, input, event, container) {
 }
 
 registerSearchbarPlugin('searchSuggestions', {
-  index: 4,
+  index: 1,
   trigger: function (text) {
     return !!text && text.indexOf('!') !== 0 && !tabs.get(tabs.getSelected()).private
   },

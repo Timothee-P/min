@@ -24,3 +24,13 @@ settings.get('darkMode', function (value) {
     }, 10000)
   }
 })
+
+
+settings.get('headerTop', function (value) {
+  if (value === true) {
+    document.body.classList.add('hide-header')
+    
+   
+  } 
+})
+

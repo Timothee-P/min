@@ -53,13 +53,10 @@ function addTab (tabId, options) {
   if (options.openInBackground) {
     return
   }
-
-  switchToTab(tabId, {
-    focusWebview: false
-  })
-  if (options.enterEditMode !== false) {
-    tabBar.enterEditMode(tabId)
-  }
+  
+  switchToTab(tabId)
+  
+  
 }
 
 /* destroys a task object and the associated webviews */
@@ -183,8 +180,46 @@ function switchToTab (id, options) {
 
   tabs.setSelected(id)
   tabBar.setActiveTab(id)
-  webviews.setSelected(id)
+  setTimeout(function(){
+    
+    webviews.setSelected(id)
+    webviews.get(id).focus()  
+  },0) 
+  
 
+  updateColorPalette()
+
+  sessionRestore.save()
+
+  tabActivity.refresh()
+  
+  
+}
+
+
+function switchToTab1 (id, options) {
+  options = options || {}
+
+  /* tab switching disabled in focus mode */
+  if (isFocusMode) {
+    showFocusModeError()
+    return
+  }
+
+  tabBar.leaveEditMode()
+
+  // set the tab's lastActivity to the current time
+
+  if (tabs.getSelected()) {
+    tabs.update(tabs.getSelected(), {
+      lastActivity: Date.now()
+    })
+  }
+
+  tabs.setSelected(id)
+  tabBar.setActiveTab(id)
+  webviews.setSelected(id)
+       
   if (options.focusWebview !== false) {
     webviews.get(id).focus()
   }
@@ -194,4 +229,15 @@ function switchToTab (id, options) {
   sessionRestore.save()
 
   tabActivity.refresh()
+  settings.get('headerTop', function (value) {
+    if (value == true) {
+        var tim = document.getElementById("navbar")
+        var timbis = document.getElementById("webviews")
+        tim.style.transition = '0s'
+        timbis.style.transition = '0s'
+        tim.style.transform = 'translateY(36px)'
+        timbis.style.height = 'calc( 100vh - 36px )'
+        
+    }}) 
+  
 }

@@ -44,9 +44,11 @@ var saveSiteURLHeader = function(myObj) {
 
 function sendIPCToWindow (window, action, data) {
   // if there are no windows, create a new one
+ 
   if (!mainWindow) {
     createWindow('mainWindow', function () {
       mainWindow.webContents.send(action, data || {})
+
     })
   }  else if ( window == mainWindow) {
     mainWindow.webContents.send(action, data || {})
@@ -127,7 +129,7 @@ function createWindowWithBounds (wintim, bounds, shouldMaximize) {
 
     // and load the index.html of the app.
     mainWindow.loadURL(browserPage)
-
+    
     if (shouldMaximize) {
       mainWindow.maximize()
 

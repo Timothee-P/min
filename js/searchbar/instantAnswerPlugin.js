@@ -102,7 +102,7 @@ function showSearchbarInstantAnswers (text, input, event, container) {
 }
 
 registerSearchbarPlugin('instantAnswers', {
-  index: 3,
+  index: 7 ,
   trigger: function (text) {
     return text.length > 3 && !urlParser.isURLMissingProtocol(text) && !tabs.get(tabs.getSelected()).private
   },

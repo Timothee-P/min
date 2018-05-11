@@ -41,6 +41,7 @@ var sessionRestore = {
         tasks.setSelected(tasks.add())
 
         addTab(currentTask.tabs.add(), {
+          enterEditMode: false,
           leaveEditMode: false // we know we aren't in edit mode yet, so we don't have to leave it
         })
         return

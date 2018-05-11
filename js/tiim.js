@@ -6,6 +6,14 @@ var tim1 =document.getElementById("tim-header")
 var topbarAfficher = false
 var topbarAfficher1 = false
 var posTopbar = 0
+
+settings.get('headerTop', function (value) {
+    if (value === true) {
+      
+     
+   
+
+
 document.onmousemove = function(e){
     
    
@@ -51,5 +59,6 @@ document.onmouseleave = function(e){
     
 }
 
-
+} 
+})
 

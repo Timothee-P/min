@@ -20,7 +20,7 @@ function showHostsSuggestions (text, input, event, container) {
 }
 
 registerSearchbarPlugin('hostsSuggestions', {
-  index: 1,
+  index: 8,
   trigger: function (text) {
     return (hosts.length && typeof text === 'string' && text.length > 2)
   },
