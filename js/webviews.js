@@ -1,5 +1,7 @@
 /* implements selecting webviews, switching between them, and creating new ones. */
 var ipc = require('electron').ipcRenderer;
+var faviconBookmark = ""
+
 // the permissionRequestHandler used for webviews
 function pagePermissionRequestHandler(webContents, permission, callback) {
   if (permission === 'notifications' || permission === 'fullscreen') {
@@ -52,7 +54,7 @@ function onPageLoad(e) {
     
   }, 0)
 }
-
+ 
 var webviews = {
   container: document.getElementById('webviews'),
   elementMap: {}, // tabId: webview
@@ -79,8 +81,13 @@ var webviews = {
 
   getDOM: function (options) {
     var w = document.createElement('webview')
-    w.setAttribute('preload', 'dist/webview.min.js')
+    var tabtim = tabs.get(options.tabId)
+    if (tabtim.private == false ){
 
+    
+    w.setAttribute('preload', 'dist/webview.min.js')
+    w.setAttribute('allowpopups','')
+  }
     if (options.url) {
       w.setAttribute('src', urlParser.parse(options.url))
     }
@@ -123,14 +130,16 @@ var webviews = {
       console.log(store);
     });
     w.addEventListener("dom-ready", function (e) {
+      settings.get('headerTop', function (value) {
+        if (value === false || topbarAfficher == true ) {
+          ipc.send('capture-page', { arg: true })
+        } else {
+          ipc.send('capture-page', { arg: false })
+        }
+      })
       
       
-     
       
-
-      
-      
-     
     });
       
       
@@ -146,7 +155,12 @@ var webviews = {
 
 
 
-    w.addEventListener('page-favicon-updated', function (e) {})
+    w.addEventListener('page-favicon-updated', function (e) {
+      faviconBookmark = e.favicons[0]
+      
+      
+   
+    })
       
 
 
@@ -160,20 +174,11 @@ var webviews = {
       tabBar.rerenderTab(tab)
     })
 
+
     w.addEventListener('did-finish-load', onPageLoad)
 
     w.addEventListener('did-finish-load', function(){
-      var tabId = this.getAttribute('data-tab')
-      if (webviews1.get(tabId)){
       
-        webviews1.destroy(tabId)}
-      var _this = this
-      setTimeout(function (){ 
-
-        var tab = _this.getAttribute('data-tab')
-        webviews1.add(tab)
-        
-      },0)
     })
     w.addEventListener('did-navigate-in-page', onPageLoad)
   
@@ -238,11 +243,11 @@ var webviews = {
       if (e.channel == 'pong') {
         var colo = e.args[0]
         var colo1 = e.args[1]
-        
+       
         updateTabColor(colo, tab, colo1)
-
-
-      } else {
+      }else if (e.channel == 'ping'){
+          console.log(e)
+      } else{
         webviews.IPCEvents.forEach(function (item) {
           if (item.name === e.channel) {
             item.fn(w, tab, e.args)
@@ -416,167 +421,3 @@ webviews.bindEvent('did-get-redirect-request', function (e, oldURL, newURL, isMa
 }, true)
 
 
-var webviews1 = {
-  container: document.getElementById('webviews'),
-  elementMap: {}, // tabId: webview
-  internalPages: {
-    crash: 'file://' + __dirname + '/pages/crash/index.html',
-    error: 'file://' + __dirname + '/pages/error/index.html'
-  },
-  events: [],
-  IPCEvents: [],
-  bindEvent: function (event, fn, useWebContents) {
-    webviews1.events.push({
-      event: event,
-      fn: fn,
-      useWebContents: useWebContents
-    })
-  },
-  bindIPC: function (name, fn) {
-    webviews1.IPCEvents.push({
-      name: name,
-      fn: fn
-    })
-  },
-
-
-  getDOM: function (options) {
-    var w = document.createElement('webview')
-    w.setAttribute('preload', 'dist/webview1.js')
-
-    if (options.url) {
-      w.setAttribute('src', urlParser.parse(options.url))
-    }
-
-    w.setAttribute('data-tab', options.tabId)
-
-    
-
-    // webview events
-    
-    webviews1.events.forEach(function (ev) {
-     
-      if (ev.useWebContents) { // some events (such as context-menu) are only available on the webContents rather than the webview element
-        w.addEventListener('did-attach', function () {
-          this.getWebContents().on(ev.event, function () {
-            ev.fn.apply(w, arguments)
-          })
-        })
-      } else {
-       
-      }
-    })
-    
-    w.addEventListener("dom-ready", function () {
-      var tab = this.getAttribute('data-tab')
-      var url = tabs.get(tab).url
-      var l = getLocation(url)
-      w.send('timhetic')
-      
-      
-      
-      
-      
-    })
-      
-
-      
-      
-      
-
-    
-
-
-
-    
-
-   
-
-    
-    
-
-
-    w.addEventListener('ipc-message', function (e) {
-
-      var w = this
-      var tab = this.getAttribute('data-tab')
-      if (e.channel == 'pong') {
-        var colo = e.args[0]
-        var colo1 = e.args[1]
-       
-        updateTabColor(colo, tab, colo1)
-        webviews1.destroy(tab)
-      }
-    })
-
-   
-
-
-    return w
-  },
-
-
-  add: function (tabId) {
-    
-    var tabData = tabs.get(tabId)
-
-    var webview = webviews1.getDOM({
-      tabId: tabId,
-      url: tabData.url,
-      
-    })
-    setTimeout(function (){
-      if (webviews1.get(tabId)){
-      
-        webviews1.destroy(tabId)
-        updateTabColor("black", tabId, "red")
-      }
-      
-    }, 25000)
-    
-
-
-    webviews1.elementMap[tabId] = webview
-
-    // this is used to hide the webview while still letting it load in the background
-    // webviews1 are hidden when added - call webviews1.setSelected to show it
-    webview.classList.add('hidden')
-    webview.classList.add('loading')
-
-    webviews1.container.appendChild(webview)
-
-    return webview
-  },
-  setSelected: function (id) {
-    var webviewEls = document.getElementsByTagName('webview')
-    for (var i = 0; i < webviewEls.length; i++) {
-      webviewEls[i].classList.add('hidden')
-    }
-
-    var wv = webviews1.get(id)
-
-    if (!wv) {
-      wv = webviews1.add(id)
-    }
-
-    wv.classList.remove('hidden')
-  },
-  update: function (id, url) {
-    webviews1.get(id).setAttribute('src', urlParser.parse(url))
-  },
-  
-  destroy: function (id) {
-    var w = webviews1.elementMap[id]
-    if (w) {
-      var partition = w.getAttribute('partition')
-      if (partition) {
-        remote.session.fromPartition(partition).destroy()
-      }
-      w.parentNode.removeChild(w)
-    }
-    delete webviews1.elementMap[id]
-  },
-  get: function (id) {
-    return webviews1.elementMap[id]
-  }
-}

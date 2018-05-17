@@ -102,7 +102,9 @@ descriptionBlock: string - the text in the description block,
 attribution: string - attribution text to display when the item is focused
 delete: function - a function to call to delete the result item when a left swipe is detected
 classList: array - a list of classes to add to the item
+
 */
+
 
 function createSearchbarItem (data) {
   var item = document.createElement('div')
@@ -241,7 +243,15 @@ function hidesearchbar () {
 var showSearchbarResults = function (text, input, event) {
   // find the real input value, accounting for highlighted suggestions and the key that was just pressed
   // delete key doesn't behave like the others, String.fromCharCode returns an unprintable character (which has a length of one)
+  if(text == ''){
 
+  
+  var dedeTim = document.getElementById("bookmark-area")
+  dedeTim.style.display = 'block'
+} else  {
+  var dedeTim = document.getElementById("bookmark-area")
+  dedeTim.style.display = 'none'
+}
   if (event && event.keyCode !== 8) {
     var realText = text.substring(0, input.selectionStart) + String.fromCharCode(event.keyCode) + text.substring(input.selectionEnd, text.length)
   } else {
@@ -317,7 +327,7 @@ webviews.bindIPC('keywordsData', function (webview, tabId, arguements) {
   var itemsShown = []
 
   var container = getSearchbarContainer('searchSuggestions')
-
+  
   data.entities.forEach(function (item, index) {
     // ignore one-word items, they're usually useless
     if (!/\s/g.test(item.trim())) {

@@ -12,7 +12,7 @@ body.windows .navbar {
 	height: 46px;
 }
 #switch-task-button {
-	position: absolute;
+	
 	top: -6px;
 	right: 0;
 	z-index: 9;
@@ -27,11 +27,12 @@ body.windows #switch-task-button {
 #task-overlay {
 	position: fixed;
 	top: 0;
+	padding: 50px 5px;
 	left: 0;
-	width: 100%;
-	height: 100%;
+	width: 100px;
+	height: 100vh;
 	background-color: #fff;
-	padding: 40px 10% 5em 10%;
+
 	white-space: nowrap;
 	overflow: auto;
 	opacity: 1;
@@ -59,7 +60,7 @@ body.windows #task-overlay {
 
 .task-tab-item button.closeTab {
     position: absolute;
-    width: 2em;
+    width: 1em;
     height: 2em;
     left: -2.1em;
     top: calc(0.16em + 1px); /* searchbar styles padding-top */
@@ -112,22 +113,31 @@ body.windows #task-overlay {
 	transition: 0.2s opacity;
 }
 
-.task-container:hover .task-drag-handle {
-	opacity: 0.6;
+.task-container:hover .task-drag-handle,.task-container:hover .fa-trash-o {
+	opacity: 1;
 }
 
 /* inputs */
+
+.fa-bars, .bookmarks-button{
+	display:none !important;
+	position: absolute;
+}
 
 .task-name {
 	-webkit-appearance: none;
 	appearance: none;
 	flex: 1;
-	font-size: 1.2em;
+	font-size: 1em;
 	color: inherit;
-	border: 0;
+	
+	border-radius: 50%;
 	background: none;
-	opacity: 0.75;
-	margin: 0.5em;
+	
+	margin: 1em 10px 0.3em 10px;
+	width: 70px;
+	height: 70px;
+	text-align: center;
 }
 .task-name::-webkit-input-placeholder {
 	color: inherit;
@@ -135,10 +145,13 @@ body.windows #task-overlay {
 }
 #add-task {
 	position: fixed;
-	bottom: 0;
-	left: 10%;
-	width: 80%;
-	padding: 1.25em;
+	bottom: 30px;
+	left: 25px;
+	width: 40px;
+	height: 40px;
+	margin: auto;
+	border-radius: 50%;
+	padding: 10px;
 	text-align: center;
 	color: inherit;
 	background-color: rgb(245, 245, 245);
@@ -148,13 +161,30 @@ body.windows #task-overlay {
 	background-color: rgb(235, 235, 235);
 }
 #add-task .fa {
-	opacity: 0.75;
-	margin-right: 0.25em;
+	font-size: 15px;
+	
+	margin: auto
+	
 }
 .task-action-container {
 	display: flex;
+	width: 100%;
+	flex-wrap: wrap;
+	justify-content: space-between;
 	align-items: center;
-	padding-right: 1em;
+	
+}
+.task-action-container i{
+	width: 15px
+}
+.fa-trash-o{
+	margin-right: 20px;
+	margin-left: 5px;
+	opacity: 0;
+}
+.task-drag-handle{
+	margin-right: 5px;
+	margin-left: 20px;
 }
 @media all and (max-width: 600px) {
 	#task-overlay {
@@ -167,16 +197,57 @@ body.windows #task-overlay {
 	}
 }
 
-body.dark-mode #task-overlay{
-	background-color: rgb(40, 44, 52) !important;
-	color: lightgrey;
-}
 
 .dark-mode #switch-task-button {
   color: dodgerblue;
 }
 
 body.dark-mode #task-overlay #add-task {
-	background-color: rgb(33, 37, 43) !important;
+	background-color: rgb(33, 37, 43);
 	color: lightgrey;
+}
+
+
+#searchbar:before {
+    content: "";
+    width: 100vw;
+    height: 1px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.075);
+    transition: 0.2s;
+}
+
+#task-overlay:before {
+    content: "";
+    width: 1px;
+    height: 100vh;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.075);
+    transition: 0.2s;
+}
+
+
+.task-tabs-container{
+	background: white;
+	border:solid 1px grey;
+	border-radius: 10px;
+	position: absolute;
+	width: 400px;
+	display:none;
+	
+}
+#task-overlay-tabs{
+	position: absolute;
+	
+	display: block;
+	width:500px;
+	height: 100vh;
+	top: 0%;
+	left: 120px;
+	z-index: 0;
+
 }

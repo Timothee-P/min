@@ -18,23 +18,12 @@
 		</div>
 	</div>
 
-	<div class="spacer"></div>
-	<div class="container padding" id="privacy-settings-container">
-		<h3 data-string="settingsPrivacyHeading"></h3>
+	
 
-		<div class="setting-section">
-			<input type="checkbox" id="checkbox-block-trackers" />
-			<label for="checkbox-block-trackers" data-string="settingsContentBlockingToggle"></label>
-			<div class="light-fade setting-secondary-label" data-string="settingsEasyListCredit" data-allowHTML></div>
-		</div>
-	</div>
-
-	<div class="spacer">
-	</div>
-
+	
 	<div class="spacer"></div>
 	<div class="container padding" id="appearance-settings-container">
-		<h3>Préference Timothée</h3>
+		<h3>Préference TopBar</h3>
 
 		<div class="setting-section">
 			<input type="checkbox" id="checkbox-header" />
@@ -42,18 +31,7 @@
 		</div>
 	</div>
 
-	<div class="spacer"></div>
-	<div class="container padding" id="appearance-settings-container">
-		<h3 data-string="settingsAppearanceHeading"></h3>
-
-		<div class="setting-section">
-			<input type="checkbox" id="checkbox-dark-mode" />
-			<label for="checkbox-dark-mode" data-string="settingsDarkModeToggle"></label>
-			<div class="spacer"></div>
-			<input type="checkbox" id="checkbox-history-button" />
-			<label for="checkbox-history-button" data-string="settingsHistoryButtonToggle"></label>
-		</div>
-	</div>
+	
 
 	<div class="spacer"></div>
 	<div class="container padding" id="swipe-settings-container">
@@ -87,6 +65,30 @@
 		</div>
 	</div>
 
+	<div class="spacer"></div>
+	<div class="container padding" id="appearance-settings-container">
+		<h3 data-string="settingsAppearanceHeading"></h3>
+
+		<div class="setting-section">
+			<input type="checkbox" id="checkbox-dark-mode" />
+			<label for="checkbox-dark-mode" data-string="settingsDarkModeToggle"></label>
+			<div class="spacer"></div>
+			<input type="checkbox" id="checkbox-history-button" />
+			<label for="checkbox-history-button" data-string="settingsHistoryButtonToggle"></label>
+		</div>
+	</div>
+
+	<div class="spacer"></div>
+	<div class="container padding" id="privacy-settings-container">
+		<h3 data-string="settingsPrivacyHeading"></h3>
+
+		<div class="setting-section">
+			<input type="checkbox" id="checkbox-block-trackers" />
+			<label for="checkbox-block-trackers" data-string="settingsContentBlockingToggle"></label>
+			<div class="light-fade setting-secondary-label" data-string="settingsEasyListCredit" data-allowHTML></div>
+		</div>
+	</div>
+
 	<!-- this needs to be placed at the bottom so that sticky positioning works correctly -->
 	<div class="banner yellow-background" id="restart-required-banner" hidden>
 		<div class="container padding">
@@ -95,6 +97,7 @@
 		</div>
 	</div>
 
+	
 	<script src="../../ext/Dexie.min.js"></script>
 	<script src="../../js/util/database.js"></script>
 	<script src="../../js/util/defaultKeyMap.js"></script>
@@ -103,6 +106,8 @@
 	<script src="../../js/util/theme.js"></script>
 	<script src="../../dist/localization.build.js"></script>
 	<script src="settings.js"></script>
+	
+
 </body>
 
 </html>

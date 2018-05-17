@@ -93,7 +93,7 @@ function updateTabColor (cr, tabId, ct) {
     return
   }
   requestIdleCallback(function () {
-      //var tilo = getTextColor(cr)
+      
       
       tabs.update(tabId, {
         backgroundColor: cr,
@@ -205,12 +205,33 @@ function updateColorPalette () {
 
 function setColor (bg, fg) {
   var background = document.getElementsByClassName('theme-background-color')
+  var backgrounds1 = document.getElementById('task-overlay')
+  var addftask = document.getElementById('add-task')
+  var inputtask =document.getElementsByClassName('task-name')
   var textcolor = document.getElementsByClassName('theme-text-color')
+  
+    if(backgrounds1.style){
+      backgrounds1.style.backgroundColor = bg
+      backgrounds1.style.color = fg
+      addftask.style.background = fg 
+      addftask.style.background.color = bg 
+      for (var i = 1;i<inputtask.length;i++)
+      
+    {
+      inputtask[i].style.color = fg
+      inputtask[i].style.border = fg+"solid 1px"
+    }
+
+    }
+      
+    
+    
+  
 
   for (var i = 0; i < background.length; i++) {
     background[i].style.backgroundColor = bg
   }
-
+  
   for (var i = 0; i < textcolor.length; i++) {
     textcolor[i].style.color = fg
   }

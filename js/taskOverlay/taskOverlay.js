@@ -1,11 +1,12 @@
 var taskContainer = document.getElementById('task-area')
+var taskContainer1 = document.getElementById('task-overlay-tabs')
 var taskSwitcherButton = document.getElementById('switch-task-button')
 var addTaskButton = document.getElementById('add-task')
-var addTaskLabel = addTaskButton.querySelector('span')
+var addTaskLabel = addTaskButton.querySelector('p')
 var taskOverlayNavbar = document.getElementById('task-overlay-navbar')
 window.ipc = electron.ipcRenderer
 taskSwitcherButton.title = l('viewTasks')
-addTaskLabel.textContent = l('newTask')
+
 
 taskSwitcherButton.addEventListener('click', function () {
   taskOverlay.toggle()
@@ -28,7 +29,7 @@ window.ipc.on('info-tasks', function (event, arg){
 });
 
 var taskOverlay = {
-  overlayElement: document.getElementById('task-overlay'),
+  overlayElement: document.getElementById('taskbar-webviews'),
   isShown: false,
   tabDragula: dragula({
     direction: 'vertical'
@@ -85,25 +86,25 @@ var taskOverlay = {
       currentTabElement.scrollIntoViewIfNeeded()
       currentTabElement.classList.add('fakefocus')
     }
-
+    taskContainer1.style.zIndex = 100
     // un-hide the overlay
-    this.overlayElement.hidden = false
   },
 
   hide: function () {
     if (this.isShown) {
       this.isShown = false
-      this.overlayElement.hidden = true
-
+      
+      taskI = 0
       // wait until the animation is complete to remove the tab elements
       setTimeout(function () {
         if (!taskOverlay.isShown) {
           empty(taskContainer)
+          empty(taskContainer1)
         }
       }, 200)
 
       this.tabDragula.containers = []
-
+      
       document.body.classList.remove('task-overlay-is-shown')
 
       // if the current tab has been deleted, switch to the most recent one
@@ -117,7 +118,7 @@ var taskOverlay = {
           switchToTab(mostRecentTab.id)
         }
       }
-
+      taskContainer1.style.zIndex = 0
       taskSwitcherButton.classList.remove('active')
     }
   },
@@ -198,3 +199,6 @@ taskOverlay.taskDragula.on('drop', function (el, target, source, sibling) {
   // reinsert the task
   tasks.splice(newIdx, 0, droppedTask)
 })
+
+
+

@@ -7,14 +7,64 @@ window.webFrame = window.electron.webFrame
 window.webFrame.setVisualZoomLevelLimits(1, 1)
 window.webFrame.setLayoutZoomLevelLimits(0, 0)
 
+
+
+document.getElementById('image-bookmark-banner').style.display = 'none'
+
 // add a class to the body for fullscreen status
 
-ipc.on('enter-full-screen', function () {
+ipc.on('enter-full-screen', function (e) {
+  console.log(e)
   document.body.classList.add('fullscreen')
 })
 
-ipc.on('leave-full-screen', function () {
+ipc.on('leave-full-screen', function (e) {
+  console.log(e)
   document.body.classList.remove('fullscreen')
+})
+function lienFavorie(url){
+  console.log('gggg')
+  var tabId = tabs.getSelected()              
+  webviews.update(tabId,url)
+  tabBar.leaveEditMode()
+  topbarAfficher = false
+}
+ipc.on('ping',function(e,data){
+  var tab = tabs.getSelected()
+  console.log(tab)
+  var img = data.image
+  console.log(img)
+  
+  var colo1 = 'black'
+  var lum = 1
+  var colo = 'rgb(' + img[2] + ',' + img[1] + ',' + img[0] + ')'
+  lum = (0.2125 * img[0]) + (0.2125 * img[2]) + (0.2125 * img[1])
+  if ( lum <= 100 ){
+    colo1 = 'white'
+  }
+  console.log(colo)
+  updateTabColor(colo, tab, colo1)
+})
+var bookrmarkData = document.getElementById('bookmark-area')
+ipc.on('bookMarkdata-Test', function(e,data){
+  
+bookrmarkData.innerHTML =""
+data.items.forEach( function (item){
+
+  
+  var book = document.createElement('a')
+  book.setAttribute('href',item.url)
+  book.setAttribute('class','bookmark_header_link')
+  book.setAttribute('onclick','lienFavorie("'+item.url+'")')
+  var faviconBook = document.createElement('img')
+  faviconBook.setAttribute('src',item.favicon)
+  book.appendChild(faviconBook)
+  bookrmarkData.appendChild(book)
+
+ 
+})
+
+
 })
 
 if (navigator.platform === 'MacIntel') {

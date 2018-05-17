@@ -1,3 +1,38 @@
+#taskbar-webviews{
+	position: fixed;
+	margin: 0;
+	left: 0;
+	top:0;
+	height: 100vh;
+	width: 50px;
+	background-color: rgb(70,70,70);
+	color:white;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #navbar {
 	padding-left: 0;
 	display: flex;
@@ -12,6 +47,22 @@
 	z-index: 2;
 	
 }
+.banner {
+	padding: 1em;
+	position: fixed;
+	bottom: -1px;
+	left: 0;
+	width: 100%;
+	z-index: 9;
+	box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.2);
+}
+.yellow-background {
+	background-color: rgb(250, 188, 43);
+}
+#restart-required-banner {
+	color: black;
+  }
+  
 .hide-header #navbar {
 	top: -36px;
 }
@@ -87,6 +138,11 @@ body:not(.windows) #menu-button {
 	display: none;
 }
 
+.bookmark_header_link img{
+	width:50px;
+	height:50px;
+	margin:15px 1em 15px 1em;
+}
 /* tab layout */
 
 #navbar #tabs {

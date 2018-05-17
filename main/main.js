@@ -1,6 +1,7 @@
 const electron = require('electron')
 const fs = require('fs')
 const path = require('path')
+const nativeImage = require('electron').nativeImage
 const app = electron.app // Module to control application life.
 const protocol = electron.protocol // Module to control protocol handling
 const BrowserWindow = electron.BrowserWindow // Module to create native browser window.
@@ -22,7 +23,36 @@ var appIsReady = false
 
 
 ipc.on('request-URL-list', function (e,myObj){
-  saveSiteURLHeader(myObj.arg1)
+  saveSiteURLHeader(myObj.arg1,myObj.arg2)
+})
+
+ipc.on('capture-page',function(e,data){
+ 
+    if (data.arg == true){
+      var cadre = {
+        x:1,
+        y: 37,
+        width: 1,
+        height: 1
+      }
+    } else {
+      var cadre = {
+        x: 1,
+        y: 1,
+        width: 1,
+        height: 1
+      }
+    }
+    var selectedWindow = BrowserWindow.getFocusedWindow()
+if(selectedWindow){
+
+
+    selectedWindow.capturePage(cadre, function(png){
+      var img = png.toBitmap()
+    
+      selectedWindow.webContents.send('ping', { image: img })
+    
+})}
 })
 
 
@@ -32,13 +62,20 @@ var saveWindowBounds = function () {
   }
 }
 
-var saveSiteURLHeader = function(myObj) {
+
+
+var saveSiteURLHeader = function(myObj,myobj1) {
+  console.log('dffgfds')
   var data  = JSON.parse(fs.readFileSync(path.join(userDataPath, 'listeURL.json'), 'utf8'));
-  
+  var data2 = nativeImage.createFromPath(myobj1).toDataURL()
  
-  data.items.push({url: myObj}) 
+  data.items.push({url: myObj,favicon: data2}) 
 
   fs.writeFile(path.join(userDataPath, 'listeURL.json'), JSON.stringify(data))
+  var selectedWindow = BrowserWindow.getFocusedWindow()
+
+
+  selectedWindow.webContents.send('bookMarkdata-Test' , data);
 }
 
 
@@ -92,6 +129,8 @@ function createWindow (wintim, cb) {
       var bounds = JSON.parse(data)
     }
 
+    
+
     // maximizes the window frame in windows 10
     // fixes https://github.com/minbrowser/min/issues/214
     // should be removed once https://github.com/electron/electron/issues/4045 is fixed
@@ -129,7 +168,7 @@ function createWindowWithBounds (wintim, bounds, shouldMaximize) {
 
     // and load the index.html of the app.
     mainWindow.loadURL(browserPage)
-    
+    mainWindow.focus()
     if (shouldMaximize) {
       mainWindow.maximize()
 
@@ -137,6 +176,25 @@ function createWindowWithBounds (wintim, bounds, shouldMaximize) {
         sendIPCToWindow(mainWindow, 'maximize')
       })
     }
+
+    mainWindow.webContents.on('did-finish-load', function () {
+      
+      var savedBookmark = fs.readFile(path.join(userDataPath, 'listeURL.json'), 'utf-8', function (e, data) {
+        if (e || !data) { // there was an error, probably because the file doesn't exist
+          var size = electron.screen.getPrimaryDisplay().workAreaSize
+          var bounds = {
+            x: 0,
+            y: 0,
+            width: size.width,
+            height: size.height
+          }
+        } else {
+         
+          var bookmarkData = JSON.parse(data)
+          mainWindow.webContents.send('bookMarkdata-Test' , bookmarkData);
+        }
+      })
+    })
 
     // save the window size for the next launch of the app
     mainWindow.on('close', function () {
@@ -217,18 +275,36 @@ function createWindowWithBounds (wintim, bounds, shouldMaximize) {
       icon: __dirname + '/icons/icon256.png',
       frame: false
     })
-
+    windows1.focus()
     // and load the index.html of the app.
     windows1.loadURL(browserPage)
 
     if (shouldMaximize) {
       windows1.maximize()
 
+
       windows1.webContents.on('did-finish-load', function () {
         sendIPCToWindow(windows1, 'maximize')
       })
     }
-
+    windows1.webContents.on('did-finish-load', function () {
+      
+      var savedBookmark = fs.readFile(path.join(userDataPath, 'listeURL.json'), 'utf-8', function (e, data) {
+        if (e || !data) { // there was an error, probably because the file doesn't exist
+          var size = electron.screen.getPrimaryDisplay().workAreaSize
+          var bounds = {
+            x: 0,
+            y: 0,
+            width: size.width,
+            height: size.height
+          }
+        } else {
+         
+          var bookmarkData = JSON.parse(data)
+          windows1.webContents.send('bookMarkdata-Test' , bookmarkData);
+        }
+      })
+    })
     // save the window size for the next launch of the app
     windows1.on('close', function () {
       saveWindowBounds()
@@ -311,7 +387,7 @@ function createWindowWithBounds (wintim, bounds, shouldMaximize) {
 
     // and load the index.html of the app.
     windows2.loadURL(browserPage)
-
+    windows2.focus()
     if (shouldMaximize) {
       windows2.maximize()
 
@@ -319,7 +395,24 @@ function createWindowWithBounds (wintim, bounds, shouldMaximize) {
         sendIPCToWindow(windows2, 'maximize')
       })
     }
-
+    windows2.webContents.on('did-finish-load', function () {
+      
+      var savedBookmark = fs.readFile(path.join(userDataPath, 'listeURL.json'), 'utf-8', function (e, data) {
+        if (e || !data) { // there was an error, probably because the file doesn't exist
+          var size = electron.screen.getPrimaryDisplay().workAreaSize
+          var bounds = {
+            x: 0,
+            y: 0,
+            width: size.width,
+            height: size.height
+          }
+        } else {
+         
+          var bookmarkData = JSON.parse(data)
+          windows2.webContents.send('bookMarkdata-Test' , bookmarkData);
+        }
+      })
+    })
     // save the window size for the next launch of the app
     windows2.on('close', function () {
       saveWindowBounds()

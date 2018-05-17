@@ -1,5 +1,5 @@
 var lastTabDeletion = 0 //TODO get rid of this
-
+var inputY = 0
 var tabBar = {
     container: document.getElementById('tabs'),
     tabElementMap: {}, //tabId: tab element
@@ -34,13 +34,6 @@ var tabBar = {
         // editingValue: an optional string to show in the searchbar instead of the current URL
         taskOverlay.hide()
         
-        //var timpoin= document.getElementById("navbar");
-        //var timbispoin = document.getElementById("webviews");
-        //timpoin.style.transition = '0'
-        //timbispoin.style.transition = '0'
-        //timpoin.style.transform = 'translateY(36px)';
-        //timbispoin.style.height = 'calc( 100vh - 36px )';
-        //topbarAfficher = true;
         var tabEl = tabBar.getTab(tabId)
         var webview = webviews.get(tabId)
 
@@ -60,6 +53,7 @@ var tabBar = {
         if (!editingValue) {
             input.select()
         }
+        topbarAfficher1 = false
         settings.get('headerTop', function (value) {
             if (value === true) {
                 var tim = document.getElementById("navbar")
@@ -68,14 +62,28 @@ var tabBar = {
                 timbis.style.transition = '0s'
                 tim.style.transform = 'translateY(36px)'
                 timbis.style.height = 'calc( 100vh - 36px )'
-                topbarAfficher = true
-            }})        
+ 
+                
+            }
+        })        
         showSearchbar(input)
+        var bookrmarkData = document.getElementsByClassName('bookmark_header_link')
+        
+        
+       
+            
+        
+        
 
+        var dedeTim = document.getElementById("bookmark-area")
         if (editingValue) {
             showSearchbarResults(editingValue, input, null)
+            dedeTim.style.display = 'none'
         } else {
             showSearchbarResults('', input, null)
+            dedeTim.style.display = 'block'
+
+            
         }
 
         // show keyword suggestions in the searchbar
@@ -100,16 +108,19 @@ var tabBar = {
                 input.blur()
             }
         }
-
+        
         settings.get('headerTop', function (value) {
-            if (value === true) {
+            topbarAfficher1 = true
+            if (value === true && inputY > 37) {
                 var tim = document.getElementById("navbar")
                 var timbis = document.getElementById("webviews")
                 tim.style.transition = '.3s ease-in-out'
                 timbis.style.transition = '.2s ease-in-out'
                 tim.style.transform = 'translateY(0)'
                 timbis.style.height = 'calc( 100vh)'
-                topbarAfficher = false
+                
+                topbarAfficher = true
+                
             }})  
         document.body.classList.remove('is-edit-mode')
         hidesearchbar()
@@ -141,6 +152,7 @@ var tabBar = {
     rerenderAll: function () {
         empty(tabBar.container)
         tabBar.tabElementMap = {}
+        console.log('OKIDOI')
         for (var i = 0; i < tabs.length; i++) {
             var el = tabBar.createElement(tabs[i])
             tabBar.container.appendChild(el)
@@ -286,6 +298,7 @@ var tabBar = {
             var sel = this.value.substring(this.selectionStart, this.selectionEnd).indexOf(v)
 
             if (v && sel === 0) {
+                
                 this.selectionStart += 1
                 e.preventDefault()
             }
@@ -357,3 +370,90 @@ var tabBar = {
 webviews.bindEvent('focus', function () {
     tabBar.leaveEditMode()
 })
+
+
+
+
+var tim = document.getElementById("navbar")
+var timbis = document.getElementById("webviews")
+var tim1 =document.getElementById("tim-header")
+var tim2=document.getElementById("task-overlay")
+var topbarAfficher = false
+var taskBar = false
+var topbarAfficher1 = true
+tim2.style.transform = 'translateX(-100px)'
+
+settings.get('headerTop', function (value) {
+    if (value == true) {
+      
+     
+
+
+document.onmousemove = function(e){
+    if (value == true) {
+    inputY = e.pageY;
+    var inputX =e.pageX;
+    tim.style.transition = '.2s'
+    timbis.style.transition = '.3s'
+     if (topbarAfficher=== false  && inputX <=530 && taskBar === true){
+        tim2.style.transform = 'translateX(0px)'
+       
+
+    } else if(inputX <= 30 && topbarAfficher == false && taskBar === false){
+        tim2.style.transform = 'translateX(0px)'
+        taskBar = true
+        taskOverlay.show()
+
+    }else if(inputX >=530 && taskBar === true){
+        taskBar = false
+        taskOverlay.hide()
+    }else{
+        tim2.style.transform = 'translateX(-100px)'
+        
+    }
+    if (topbarAfficher1 === true){
+        if ( inputY <= 172 && topbarAfficher == true){
+            tim.style.transform = 'translateY(36px)'
+            timbis.style.height = 'calc( 100vh - 36px )'
+            
+        } else if (inputY <= 15 && topbarAfficher == false){ 
+            
+                  
+            tim.style.transition = '.2s'
+            timbis.style.transition = '.3s'
+            tim.style.transform = 'translateY(36px)'
+            timbis.style.height = 'calc( 100vh - 36px )'
+            topbarAfficher = true
+            
+        } else if (inputY <= 36 && topbarAfficher == false){
+            ipc.send('capture-page', { arg: false })
+        }else {
+            tim.style.transition = '.3s'
+            timbis.style.transition = '.2s'
+            topbarAfficher = false
+            
+            tim.style.transform = 'translateY(0)';
+            timbis.style.height = '100vh'
+        }
+    }
+} else {
+    topbarAfficher = false
+}
+};
+
+document.onmouseleave = function(e){
+    if (topbarAfficher1 === true){
+        if (topbarAfficher == false){
+            tim.style.transition = '.3s'
+        timbis.style.transition = '.2s'
+            tim.style.transform = 'translateY(0px)'
+            timbis.style.height = 'calc( 100vh )'
+        }
+    }
+    
+}
+
+} 
+
+})
+
