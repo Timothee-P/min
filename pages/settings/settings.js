@@ -116,6 +116,7 @@ headerCheckbox.addEventListener('change', function (e) {
   showRestartRequiredBanner()
 })
 
+
 /* history button setting */
 
 settings.get('historyButton', function (value) {

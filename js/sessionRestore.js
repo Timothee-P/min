@@ -24,11 +24,12 @@ var sessionRestore = {
         tasks.setSelected(tasks.add()) // create a new task
 
         var newTab = currentTask.tabs.add({
-          url: 'https://minbrowser.github.io/min/tour'
+          url: 'https://google.fr'
         })
         addTab(newTab, {
           enterEditMode: false
         })
+        settings.set('headerTop',true)
         return
       }
 
