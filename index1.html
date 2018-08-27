@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+    <button onclick="merge()">JSON</button>
+    
+</body>
+<script type="text/javascript" >
+    const fs = require('fs')
+    
+    var data  = JSON.parse(fs.readFileSync('./timm3.json', 'utf8'))
+    console.log(data)
+    var data1  = JSON.parse(fs.readFileSync('./timm4.json', 'utf8'))
+    console.log(data1)
+    
+
+    function merge(){
+    var dataFinal  = []
+    for(i=0;i<275;i++){
+        var bonneCate = false
+        var n=0;
+        while(bonneCate == false || n==277){
+            if (data[i].id_category == data1[n].id_category){
+                bonneCate = true
+            } else {
+                n++
+            }
+        }
+        var dataH = {
+            "id_category":data[i].id_category, 
+            "id_parent":data[i].id_parent, 
+            "level_depth":data[i].level_depth,
+            
+            
+            "name":data1[n].name,
+            "description":data1[n].description,
+            "link_rewrite":data1[n].link_rewrite
+        }
+
+        dataFinal[i] = dataH
+        
+        
+
+
+    }
+   
+    fs.writeFile('./timFinal.json', JSON.stringify(dataFinal))
+
+    }
+</script>
+</html>

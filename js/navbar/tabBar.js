@@ -380,6 +380,7 @@ var tim1 =document.getElementById("tim-header")
 var tim2=document.getElementById("task-overlay")
 var topbarAfficher = false
 var taskBar = false
+var topBarcolor = false
 var topbarAfficher1 = true
 tim2.style.transform = 'translateX(-100px)'
 
@@ -395,7 +396,7 @@ document.onmousemove = function(e){
     var inputX =e.pageX;
     tim.style.transition = '.2s'
     timbis.style.transition = '.3s'
-     if (topbarAfficher=== false  && inputX <=530 && taskBar === true){
+     if (topbarAfficher=== false  && inputX <=130 && taskBar === true){
         tim2.style.transform = 'translateX(0px)'
        
 
@@ -403,8 +404,9 @@ document.onmousemove = function(e){
         tim2.style.transform = 'translateX(0px)'
         taskBar = true
         taskOverlay.show()
+        
 
-    }else if(inputX >=530 && taskBar === true){
+    }else if(inputX >=130 && taskBar === true){
         taskBar = false
         taskOverlay.hide()
     }else{
@@ -415,6 +417,7 @@ document.onmousemove = function(e){
         if ( inputY <= 172 && topbarAfficher == true){
             tim.style.transform = 'translateY(36px)'
             timbis.style.height = 'calc( 100vh - 36px )'
+
             
         } else if (inputY <= 15 && topbarAfficher == false){ 
             
@@ -425,13 +428,15 @@ document.onmousemove = function(e){
             timbis.style.height = 'calc( 100vh - 36px )'
             topbarAfficher = true
             
-        } else if (inputY <= 36 && topbarAfficher == false){
+        } else if (inputY <= 36 && topbarAfficher == false && topBarcolor== false){
             ipc.send('capture-page', { arg: false })
+            topBarcolor = true
+            
         }else {
             tim.style.transition = '.3s'
             timbis.style.transition = '.2s'
             topbarAfficher = false
-            
+            topBarcolor = false
             tim.style.transform = 'translateY(0)';
             timbis.style.height = '100vh'
         }

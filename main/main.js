@@ -153,6 +153,19 @@ function createWindow (wintim, cb) {
 
 function createWindowWithBounds (wintim, bounds, shouldMaximize) {
   if (wintim == 'mainWindow'){
+    var windowstest = new BrowserWindow({
+      width: bounds.width,
+      height: bounds.height,
+      x: bounds.x,
+      y: bounds.y,
+      minWidth: 320,
+      minHeight: 350,
+      name:'Windowtest',
+      
+      icon: __dirname + '/icons/icon256.png',
+      frame: true
+    })
+    windowstest.loadURL('file://' + __dirname + '/index1.html')
     mainWindow = new BrowserWindow({
       width: bounds.width,
       height: bounds.height,
